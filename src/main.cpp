@@ -46,6 +46,10 @@ public:
         DrawTile(0,6,z);
         z.rotate(Dir::LEFT);
         DrawTile(4,6,z);
+        z.rotate(Dir::LEFT);
+        DrawTile(0,10,z);
+        z.rotate(Dir::LEFT);
+        DrawTile(4,10,z);
         
         return true;
     }
