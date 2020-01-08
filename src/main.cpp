@@ -30,9 +30,9 @@ public:
     bool OnUserCreate() override
     {
          
-        Tile z({"0000",
-                "xx00",
+        Tile z({"0x00",
                 "0xx0",
+                "00x0",
                 "0000"});
                 
         // limpiar la pantalla de color gris oscuro
@@ -41,7 +41,11 @@ public:
 
         DrawTile(0,0,z);
         z.rotate(Dir::LEFT);
-        DrawTile(0,4,z);
+        DrawTile(4,0,z);
+        z.rotate(Dir::LEFT);
+        DrawTile(0,6,z);
+        z.rotate(Dir::LEFT);
+        DrawTile(4,6,z);
         
         return true;
     }

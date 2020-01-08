@@ -2,7 +2,7 @@
 #define TETRIS_H
 #include <assert.h>
 #include <stdint.h>
-
+#include <bits/stdc++.h>
 #include <vector>
 
 enum Dir{
@@ -32,11 +32,41 @@ struct Tile
     // funcion que rota la ficha 90 grados en una direccion
     void rotate(Dir dir)
     {
-        // left: transpose and mirror
-        for (int n = 0; n < w - 2; n++)
-            for (int m = n + 1; m < h - 1; m++)
-                swap(n,m,m,n);
-        // right: mirror and transpose
+        switch (dir)
+        {
+        case Dir::RIGHT:
+            // right: transpose and mirror
+            for (int n = 0; n < w - 2; n++)
+            {
+                for (int m = n + 1; m < h - 1; m++)
+                {
+                    swap(n,m,m,n);
+                }
+            }
+            // mirror:
+            for (int i = 0; i < w; i++)
+            {
+                std::reverse(shape[i].begin(), shape[i].end());
+            }
+            break;
+        case Dir::LEFT:
+            // left: mirror and transpose
+            // mirror:
+            for (int i = 0; i < w; i++)
+            {
+                std::reverse(shape[i].begin(), shape[i].end());
+            }
+            for (int n = 0; n < w - 2; n++)
+            {
+                for (int m = n + 1; m < h - 1; m++)
+                {
+                    swap(n,m,m,n);
+                }
+            }
+            break;
+        default:
+            break;
+        }
     };
     // funcion que verifica si la ficha encaja en la posicion en el tablero
     bool fits(int x, int y, const Board& board)
