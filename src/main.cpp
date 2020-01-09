@@ -5,7 +5,14 @@
 // Override base class with your custom functionality
 class TetrisGame : public olc::PixelGameEngine
 {
+public:
+    TetrisGame()
+    {
+        sAppName = "TetrisGame";
+    }
+
 private:
+    Tile z;
     void DrawTile(int x, int y, Tile tile)
     {
         int count = 0;
@@ -21,40 +28,29 @@ private:
         }
     }
 public:
-    TetrisGame()
-    {
-        sAppName = "TetrisGame";
-    }
-
-public:
     bool OnUserCreate() override
     {
-         
-        Tile z({"0x00",
+        z.init({"0x00",
                 "0xx0",
                 "00x0",
                 "0000"});
-                
         // limpiar la pantalla de color gris oscuro
         Clear(olc::Pixel(0,0,0));
         // dibujar 4 esquinas
 
-        DrawTile(0,0,z);
-        z.rotate(Dir::LEFT);
-        DrawTile(4,0,z);
-        z.rotate(Dir::LEFT);
-        DrawTile(0,6,z);
-        z.rotate(Dir::LEFT);
-        DrawTile(4,6,z);
-        z.rotate(Dir::LEFT);
-        DrawTile(0,10,z);
-        z.rotate(Dir::LEFT);
-        DrawTile(4,10,z);
+        DrawTile(3,8,z);
         
         return true;
     }
     bool OnUserUpdate(float fElapsedTime) override
     {
+        if(GetKey(olc::Key::UP).bPressed)
+        {
+           z.rotate(Dir::LEFT);
+           Clear(olc::BLACK);
+           DrawTile(3,8,z);
+        }
+
         return true;
     }
 };
