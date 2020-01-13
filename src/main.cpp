@@ -1,65 +1,103 @@
 #define OLC_PGE_APPLICATION
+#include <chrono>
 #include "olcPixelGameEngine.h"
 #include "tetris.h"
+
+using namespace std::chrono_literals;
 // Override base class with your custom functionality
 class TetrisGame : public olc::PixelGameEngine
 {
 private:
     bool pixel = false;
     Tile f;
+    Board board;
+    int time = 0;
 
-    void DrawTile(int x, int y, Tile tile)
+    void DrawTile(Tile tile)
     {
         for(int fila = 0; fila < tile.h; fila++)
         {
             for(int col = 0; col < tile.w; col++)
             {
-                if(tile.shape[fila][col] == 'x')
-                    Draw(col + x, fila + y, tile.color);
+                if((tile.shape[fila][col] == 'x') && validPixelPos(col + tile.x, fila + tile.y))
+                    Draw(col + tile.x, fila + tile.y, tile.color);
             }
         }
     }
+    bool validPixelPos(int x, int y)
+    {
+        // std::cout << x << "," << y << std::endl;
+        if(x >= ScreenWidth() || x < 0 || y >= ScreenHeight() || y < 0)
+            return false;
+
+        return true;
+    };
+
 public:
     TetrisGame()
     {
         sAppName = "TetrisGame";
     }
-
-public:
     bool OnUserCreate() override
     {
-        //        3210  
-        f.init({"0000",
+         
+        board.init(10, 20);
+        f.init({"0x00",
                 "0x00",
-                "0x00",
-                "0xx0"}, olc::YELLOW);   
-
-        Tile g({"0000",
-                "0x00",
-                "0x00",
-                "0xx0"}, olc::BLUE);  
+                "0xx0",
+                "0000"}, olc::YELLOW);   
+ 
         // limpiar la pantalla de color gris oscuro
         Clear(olc::Pixel(0,0,0));
-        // dibujar 4 esquinas
-        DrawTile(0,0,f);
-
-        DrawTile(4,0,g);
-
         return true;
     }
     // game loop
     bool OnUserUpdate(float fElapsedTime) override
     {
-
         // temporizacion
+        std::this_thread::sleep_for(100ms);
         // actualizar el estado
         // -- atender eventos (teclado, mouse, otros)
         if(GetKey(olc::Key::UP).bPressed)
+        {
             f.rotate(Dir::RIGHT);
+        }
+        if(GetKey(olc::Key::LEFT).bHeld)
+        {
+            // mover a la izquierda
+            if(board.doesTileFit(f.x - 1, f.y, f))
+            {
+                f.x--;
+            }
+        }
+        if(GetKey(olc::Key::RIGHT).bHeld)
+        {
+            // mover a la derecha
+            if(board.doesTileFit(f.x + 1, f.y, f))
+            {
+                f.x++;
+            }
+        }
+        if ((time % 10 == 0) || (GetKey(olc::Key::DOWN).bHeld))
+        {
+            // mover abajo
+            std::cout << "step" << std::endl;
+            std::cout << f.x << ','<< f.y << std::endl;
+            auto fits = board.doesTileFit(f.x, f.y + 1, f);
+            std::cout << "seeing..." << std::endl;
+            if (fits)
+            {
+                // std::cout << f.y << std::endl;
+                f.y++;
+            }
+        }
 
         // dibujar el estado
-        // Clear(olc::BLACK);
-        DrawTile(4, 9, f);
+        Clear(olc::BLACK);
+        // std::cout << "step" << std::endl;
+        DrawTile(f);
+        // std::cout << "step fin" << std::endl;
+        time++;
         return true;
     }
 };
