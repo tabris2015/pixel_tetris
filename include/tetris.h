@@ -108,7 +108,7 @@ public:
             for(int col = 0; col < tile.w; col++)
             {
                 // if(!validPos(x + col, y + fila)) continue;
-                if((y + fila) > (h - 1) || (x + col) > (w - 1)) return false;
+                if(tile.shape[fila][col] == 'x' && (y + fila) > (h - 1)) return false;
                 if(tile.shape[fila][col] == 'x' && (state[y + fila][x + col] != '0')) 
                 {
                     std::cout << "--- doesnt fit!" << std::endl;

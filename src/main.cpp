@@ -81,13 +81,9 @@ public:
         if ((time % 10 == 0) || (GetKey(olc::Key::DOWN).bHeld))
         {
             // mover abajo
-            std::cout << "step" << std::endl;
-            std::cout << f.x << ','<< f.y << std::endl;
             auto fits = board.doesTileFit(f.x, f.y + 1, f);
-            std::cout << "seeing..." << std::endl;
             if (fits)
             {
-                // std::cout << f.y << std::endl;
                 f.y++;
             }
         }
