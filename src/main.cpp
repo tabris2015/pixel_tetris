@@ -1,5 +1,6 @@
 #define OLC_PGE_APPLICATION
 #include <chrono>
+#include <stdlib.h>     // rand()
 #include "olcPixelGameEngine.h"
 #include "tetris.h"
 
@@ -12,6 +13,8 @@ private:
     Tile f;
     Board board;
     int time;
+    int score = 0;
+    int interval = 20;
     void DrawTile(Tile tile)
     {
         for(int fila = 0; fila < tile.h; fila++)
@@ -24,6 +27,17 @@ private:
         }
     }
 
+    void DrawBoard(Board board)
+    {
+        for(int fila = 0; fila < board.h; fila++)
+        {
+            for(int col = 0; col < board.w; col++)
+            {
+                if(board.state[fila][col] == 't')
+                    Draw(col, fila, olc::DARK_GREY);
+            }
+        }
+    }
 public:
     TetrisGame()
     {
@@ -31,11 +45,8 @@ public:
     }
     bool OnUserCreate() override
     {
-        //        3210  
-        f.init({"0000",
-                "0x00",
-                "0x00",
-                "0xx0"}, olc::RED);   
+        // inicializar ficha aleatoria 
+        f.init(TILES[rand() % (N_TILES - 1)], olc::Pixel(rand() % 255, rand() % 255, rand() % 255));   
 
         board.init(ScreenWidth(), ScreenHeight());
 
@@ -75,17 +86,38 @@ public:
             {
                 f.y++;
             }
+
         }
 
-        if(!(time % 20))
+        if(!(time % interval))
         {
+            std::cout << "score: " << score << std::endl;
+            if(board.isTileBottom(f)) 
+            {
+                // insertar ficha en el estado del tablero
+                board.insertTile(f);
+                score++;
+                // debug print
+                // board.printState();
+                f.init(TILES[rand() % (N_TILES - 1)], olc::Pixel(rand() % 255, rand() % 255, rand() % 255));
+                f.x = rand() % (ScreenWidth() - 4);
+                f.y = 0;
+            }
             if(board.doesTileFit(f.x, f.y + 1, f))
             {
                 f.y++;
             }
         }
+
+        if(score > 30) interval = 18;
+        if(score > 50) interval = 15;
+        if(score > 80) interval = 10;
+        if(score > 100) interval = 5;
+        
+        score += board.updateTetris() * 10;
         // dibujar el estado
         Clear(olc::BLACK);
+        DrawBoard(board);
         DrawTile(f);
         time++;
         // std::cout << time << std::endl;
