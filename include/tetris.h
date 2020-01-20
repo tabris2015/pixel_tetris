@@ -5,11 +5,45 @@
 #include <string>
 #include <bits/stdc++.h>
 
+#define N_TILES 7
+
 enum Dir
 {
     RIGHT,
     LEFT,
     N_DIRS
+};
+
+// fichas del juego
+std::vector<std::string> TILES[N_TILES] = {
+                {"0000",
+                 "0x00",
+                 "0x00",
+                 "0xx0"},
+                {"0000",
+                 "0x00",
+                 "0x00",
+                 "xx00"},
+                {"0000",
+                 "0000",
+                 "xx00",
+                 "0xx0"},
+                {"0000",
+                 "0000",
+                 "00xx",
+                 "0xx0"},
+                {"0000",
+                 "0000",
+                 "0x00",
+                 "xxx0"},
+                {"0x00",
+                 "0x00",
+                 "0x00",
+                 "0x00"},
+                {"0000",
+                 "0000",
+                 "0xx0",
+                 "0xx0"}
 };
 
 struct Tile 
@@ -87,11 +121,11 @@ private:
 class Board
 {
 private:
+public:
     int w;
     int h;
     // estado del tablero
     std::vector<std::vector<char>> state;
-public:
     Board(){};
     Board(int width, int height): w(width), h(height)
     {
@@ -130,6 +164,81 @@ public:
             }
         }
         return true;
+    };
+
+    bool isTileBottom(Tile& tile)
+    {
+        for(int fila = 0; fila < tile.h; fila++)
+        {
+            for(int col = 0; col < tile.w; col++)
+            {
+                if((tile.y + fila) >= h) return true;
+                if(tile.shape[fila][col] == 'x' && (tile.y + fila) == (h - 1)) return true;
+                if(tile.shape[fila][col] == 'x' && state[tile.y + fila + 1][tile.x + col] != '0') return true;
+            }
+        }
+        return false;
+    };
+
+    void insertTile(Tile& tile)
+    {
+        for(int fila = 0; fila < tile.h; fila++)
+        {
+            for(int col = 0; col < tile.w; col++)
+            {
+                if(tile.shape[fila][col] == 'x' && (tile.y + fila) > (h - 1)) continue;
+                if(tile.shape[fila][col] == 'x' && (state[tile.y +fila][tile.x + col] == '0'))
+                {
+                    state[tile.y +fila][tile.x + col] = 't';
+                }
+
+            }
+        }
+    };
+
+    void printState()
+    {
+        std::cout << "------------" << std::endl;
+        for(auto& fila: state)
+        {
+            std::cout << '|';
+            for(auto& c: fila)
+                std::cout << c;
+            std::cout << '|' << std::endl;
+        }
+        std::cout << "------------" << std::endl;
+    };
+
+    int updateTetris()
+    {
+        int rows = 0;
+        // TODO: convertir el tablero a un std::vector<std::string>>
+        for(int fila = (h - 1); fila >= 0; fila--)
+        {
+            std::string s(state[fila].begin(), state[fila].end());
+
+            if(s == "tttttttttt")
+            {
+                // quito la fila completa
+                state.erase(state.begin() + fila);
+                std::vector<char> r(w, '0');
+                state.insert(state.begin(), r);
+                rows++;
+            }
+        }
+
+        return rows;
+    };
+
+    bool isGameOver()
+    {
+        // verifico la primera fila
+        for(auto& c: state[0])
+        {
+            if(c != '0')
+                return true;
+        }
+        return false;
     };
 };
 
